@@ -8,7 +8,7 @@ public class PaymentsDbContextFactory : IDesignTimeDbContextFactory<PaymentsDbCo
     public PaymentsDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<PaymentsDbContext>();
-        optionsBuilder.UseSqlServer("Server=localhost;Database=FCG_Payments;Trusted_Connection=True;TrustServerCertificate=True");
+        optionsBuilder.UseSqlServer("Server=127.0.0.1;Database=FCG_Payments;User Id=sa;Password=Fcg2024Test!;Encrypt=False;TrustServerCertificate=True");
 
         return new PaymentsDbContext(optionsBuilder.Options);
     }

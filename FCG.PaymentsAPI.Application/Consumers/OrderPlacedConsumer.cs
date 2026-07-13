@@ -1,4 +1,4 @@
-using FCG.PaymentsAPI.Domain.Events;
+using FCG.Shared.Events;
 using FCG.PaymentsAPI.Application.Services;
 using MassTransit;
 using Microsoft.Extensions.Logging;

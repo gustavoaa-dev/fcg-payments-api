@@ -1,5 +1,5 @@
 using FCG.PaymentsAPI.Domain.Entities;
-using FCG.PaymentsAPI.Domain.Events;
+using FCG.Shared.Events;
 using FCG.PaymentsAPI.Domain.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
