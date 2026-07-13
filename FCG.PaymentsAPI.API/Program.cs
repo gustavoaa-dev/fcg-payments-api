@@ -44,5 +44,12 @@ builder.Services.AddScoped<PaymentService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+        .GetRequiredService<PaymentsDbContext>();
+    db.Database.Migrate();
+}
+
 app.Run();
 
