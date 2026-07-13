@@ -1,6 +1,6 @@
 # FCG Payments API
 
-Microsserviço responsável pelo processamento de pagamentos da plataforma FCG (Facul Cloud Games).
+Microsserviço responsável pelo processamento de pagamentos da plataforma FCG (Fiap Cloud Games).
 
 ## Funcionalidades
 
