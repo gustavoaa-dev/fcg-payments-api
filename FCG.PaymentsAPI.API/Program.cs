@@ -5,6 +5,7 @@ using FCG.PaymentsAPI.Infrastructure.Data;
 using FCG.PaymentsAPI.Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,12 +45,17 @@ builder.Services.AddScoped<PaymentService>();
 
 var app = builder.Build();
 
+// Metricas HTTP: registradas antes dos demais middlewares (mesmo padrao do users-api).
+app.UseHttpMetrics();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider
         .GetRequiredService<PaymentsDbContext>();
     db.Database.Migrate();
 }
+
+app.MapMetrics();
 
 app.Run();
 
