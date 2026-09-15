@@ -3,6 +3,7 @@ using FCG.Shared.Events;
 using FCG.PaymentsAPI.Domain.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 
 namespace FCG.PaymentsAPI.Application.Services;
 
@@ -11,6 +12,13 @@ public class PaymentService
     private readonly IPaymentRepository _paymentRepository;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<PaymentService> _logger;
+
+    // Metrica de negocio: o payments-api e consumidor de fila, entao o /metrics HTTP
+    // dele fica praticamente vazio -- e este contador que da sinal no dashboard.
+    private static readonly Counter PagamentosProcessados = Metrics.CreateCounter(
+        "fcg_payments_processados_total",
+        "Pagamentos processados pela API, por status.",
+        new CounterConfiguration { LabelNames = new[] { "status" } });
 
     public PaymentService(
         IPaymentRepository paymentRepository,
@@ -51,5 +59,7 @@ public class PaymentService
         _logger.LogInformation(
             "Pagamento processado - Order: {OrderId} | Game: {GameId} | User: {UserId} | Status: {Status}",
             order.OrderId, order.GameId, order.UserId, status);
+
+        PagamentosProcessados.WithLabels(status).Inc();
     }
 }

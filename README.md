@@ -14,6 +14,7 @@ Microsserviço responsável pelo processamento de pagamentos da plataforma FCG (
 - .NET 8 (ASP.NET Core Web API)
 - Entity Framework Core + SQL Server
 - MassTransit + RabbitMQ
+- prometheus-net 8.2.1 (`/metrics`)
 
 > Este serviço é puramente orientado a eventos — não possui endpoints HTTP públicos.
 
@@ -58,6 +59,23 @@ O `appsettings.json` **não** carrega senha: a credencial vem só daqui — no c
 |---|---|---|
 | `RABBITMQ_HOST` | Host do RabbitMQ | `localhost` |
 | `ConnectionStrings__DefaultConnection` | String de conexão SQL Server | — |
+
+## Observabilidade
+
+O serviço é **consumidor de fila** (ver acima): não tem controllers e nenhuma chamada HTTP de negócio chega até ele. Mesmo assim ele expõe `/metrics` com a biblioteca `prometheus-net` 8.2.1 — `app.UseHttpMetrics()` e `app.MapMetrics()`, o mesmo padrão de `users-api` e `catalog-api` —, e é esse endpoint que o Prometheus raspa (alvo `payments-api:80`, job `fcg-apis`, a cada 15s).
+
+Como o tráfego HTTP dele é praticamente nulo, quem dá sinal ao dashboard é a **métrica de negócio**: o contador `fcg_payments_processados_total{status="Approved"|"Rejected"}`, incrementado em `PaymentService.ProcessarPagamento` a cada evento `OrderPlacedEvent` processado. É ele que alimenta o painel *Pagamentos processados por status*.
+
+> O contador é registrado já com o sufixo `_total` porque o `prometheus-net` 8.2.1 expõe a série **exatamente como registrada**. Para conferir em runtime (com o `port-forward` ativo em outro terminal):
+
+```powershell
+kubectl port-forward svc/payments-api 18084:80
+curl.exe -s http://localhost:18084/metrics | Select-String 'fcg_payments'
+```
+
+O serviço **não** expõe `/health` nem declara probes de `startup`/`readiness`/`liveness`: sem endpoint HTTP de negócio, não há o que sondar por HTTP.
+
+Os alvos e o dashboard estão no README do [fcg-orchestration](https://github.com/gustavoaa-dev/fcg-orchestration), seção *Observabilidade*.
 
 ## Fluxo de eventos
 
