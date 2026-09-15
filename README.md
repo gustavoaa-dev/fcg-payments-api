@@ -28,6 +28,10 @@ Microsserviço responsável pelo processamento de pagamentos da plataforma FCG (
 ### Executar localmente
 
 ```bash
+# Nenhuma credencial é versionada: a string de conexão vem do ambiente
+# (no cluster, do Secret do Kubernetes).
+export ConnectionStrings__DefaultConnection='Server=127.0.0.1;Database=FCG_Payments;User Id=sa;Password=<sua-senha>;TrustServerCertificate=True'
+
 dotnet run --project FCG.PaymentsAPI.API
 ```
 
@@ -47,6 +51,8 @@ docker-compose up -d
 ```
 
 ## Variáveis de ambiente
+
+O `appsettings.json` **não** carrega senha: a credencial vem só daqui — no cluster, do Secret do Kubernetes (ver [fcg-orchestration](https://github.com/gustavoaa-dev/fcg-orchestration), seção *Segredos*).
 
 | Variável | Descrição | Padrão |
 |---|---|---|
